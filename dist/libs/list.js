@@ -1,25 +1,53 @@
-import axios from 'axios';
+import axios from "axios";
 export const listPlaylistItems = async (url, key, playlistId) => {
     try {
-        const res = await axios({
-            method: 'GET',
-            url,
-            headers: {
-                Accept: 'application/json'
-            },
-            params: {
-                key,
-                part: 'snippet',
-                playlistId,
-            }
-        });
-        console.dir({ data: res.data }, { depth: null });
-        console.log({
-            t: res.data.items[0].snippet.resourceId.videoId
-        });
+        let list = [];
+        let pageToken = null;
+        while (1) {
+            const res = await axios({
+                method: "GET",
+                url: "https://www.googleapis.com/youtube/v3/playlistItems",
+                headers: {
+                    Accept: "application/json",
+                },
+                params: {
+                    key,
+                    part: "snippet",
+                    playlistId,
+                    pageToken,
+                    maxResults: 2,
+                },
+            });
+            //   console.log(res.data.nextPageToken);
+            pageToken = res.data.nextPageToken;
+            console.log({ item: res.data.items[0] });
+            console.log({
+                title: res.data.items[0].snippet.title,
+                videoId: res.data.items[0].snippet.resourceId.videoId,
+            });
+            //   console.log(res.data.items.length)
+            const items = res.data.items.map((v) => {
+                const title = res.data.items[0].snippet.title;
+                const videoId = res.data.items[0].snippet.resourceId.videoId;
+                return {
+                    title,
+                    videoId
+                };
+            });
+            list = [...list, ...items];
+            //   console.log({list})
+            break;
+            if (!pageToken)
+                break;
+        }
+        // console.dir({ data: res.data }, { depth: null })
+        // console.log({
+        //     t: res.data.items[0].snippet.resourceId.videoId
+        // })
+        return list;
     }
     catch (e) {
-        console.log(e.response.data);
+        console.log(e.response?.data);
         console.log(`could not load playlist items`);
     }
 };
