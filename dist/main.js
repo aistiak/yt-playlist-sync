@@ -25,12 +25,18 @@ import { listPlaylistItems } from './libs/list.js';
 //     }
 // }
 const { playlistId, key, url } = process.env;
+console.log({
+    playlistId,
+    key,
+    url
+});
 async function main() {
     const sampleVideoId = '4zAThXFOy2c';
     const list = await listPlaylistItems(url, key, playlistId);
     console.log(list);
     // console.log(list.length)
     for (const item of list) {
+        console.log('downloading' + item.title);
         await downloadAudio(item.videoId, item.title);
     }
     console.log(key);

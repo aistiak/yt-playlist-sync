@@ -15,7 +15,7 @@ export const listPlaylistItems = async (url, key, playlistId) => {
                     part: "snippet",
                     playlistId,
                     pageToken,
-                    maxResults: 2,
+                    // maxResults: 50,
                 },
             });
             //   console.log(res.data.nextPageToken);
@@ -26,16 +26,16 @@ export const listPlaylistItems = async (url, key, playlistId) => {
                 videoId: res.data.items[0].snippet.resourceId.videoId,
             });
             //   console.log(res.data.items.length)
-            const items = res.data.items.map((v) => {
-                const title = res.data.items[0].snippet.title;
-                const videoId = res.data.items[0].snippet.resourceId.videoId;
+            const items = res.data.items.map((v, idx) => {
+                const title = res.data.items[idx].snippet.title;
+                const videoId = res.data.items[idx].snippet.resourceId.videoId;
                 return {
                     title,
                     videoId
                 };
             });
             list = [...list, ...items];
-            //   console.log({list})
+            console.log({ list });
             break;
             if (!pageToken)
                 break;
@@ -47,7 +47,9 @@ export const listPlaylistItems = async (url, key, playlistId) => {
         return list;
     }
     catch (e) {
+        console.log(e);
         console.log(e.response?.data);
         console.log(`could not load playlist items`);
+        return [];
     }
 };
